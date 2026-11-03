@@ -1,0 +1,1 @@
+package com.tutorhub.tutor.dto; public record TutorProfileResponse(Long userId,String fullName,String headline,String bio,String educationLevel,String school,String major,short yearsExperience,long hourlyRate,String teachingMode,Integer districtId,String verificationStatus){}

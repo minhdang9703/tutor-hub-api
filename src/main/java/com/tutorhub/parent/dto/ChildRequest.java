@@ -1,0 +1,1 @@
+package com.tutorhub.parent.dto; import jakarta.validation.constraints.*; public record ChildRequest(@NotBlank @Size(max=80) String name,@Min(1) @Max(12) short grade,@Size(max=160) String school,@Size(max=500) String notes){}

@@ -1,0 +1,1 @@
+package com.tutorhub.tutor.dto; import jakarta.validation.constraints.*; public record TutorProfileRequest(@Size(max=160) String headline,String bio,@Size(max=20) String educationLevel,@Size(max=160) String school,@Size(max=120) String major,@Min(0) short yearsExperience,@Min(0) long hourlyRate,@Pattern(regexp="ONLINE|AT_HOME|BOTH") String teachingMode,Integer districtId){}

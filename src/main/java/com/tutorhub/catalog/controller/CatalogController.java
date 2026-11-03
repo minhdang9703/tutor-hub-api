@@ -1,0 +1,3 @@
+package com.tutorhub.catalog.controller;
+import com.tutorhub.catalog.dto.*; import com.tutorhub.catalog.service.CatalogService; import java.util.List; import org.springframework.web.bind.annotation.*;
+@RestController @RequestMapping("/api/v1") public class CatalogController { private final CatalogService catalog; public CatalogController(CatalogService catalog){this.catalog=catalog;} @GetMapping("/subjects") List<SubjectResponse> subjects(){return catalog.subjects();} @GetMapping("/districts") List<DistrictResponse> districts(@RequestParam(required=false) String city){return catalog.districts(city);} }

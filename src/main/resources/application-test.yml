@@ -1,0 +1,7 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    properties:
+      hibernate.jdbc.time_zone: UTC

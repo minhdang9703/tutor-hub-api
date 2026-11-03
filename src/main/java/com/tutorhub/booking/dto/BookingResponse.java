@@ -1,0 +1,1 @@
+package com.tutorhub.booking.dto; import java.time.Instant; public record BookingResponse(Long id,Long tutorId,Long parentId,Long childId,Integer subjectId,Instant startAt,Instant endAt,String mode,String location,String meetingUrl,long price,boolean isTrial,String status,String cancelReason,String tutorPhone,String parentPhone){}

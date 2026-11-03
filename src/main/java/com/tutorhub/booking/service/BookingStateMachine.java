@@ -1,0 +1,5 @@
+package com.tutorhub.booking.service;
+import com.tutorhub.booking.entity.BookingStatus; import com.tutorhub.common.exception.BusinessRuleException;
+import java.time.Instant;
+import org.springframework.stereotype.Component;
+@Component public class BookingStateMachine { public BookingStatus transition(BookingStatus from,String action,Instant startAt,Instant now){return switch(action){case "confirm"->require(from==BookingStatus.PENDING,BookingStatus.CONFIRMED);case "cancel"->require(from==BookingStatus.PENDING||from==BookingStatus.CONFIRMED,BookingStatus.CANCELLED);case "complete"->{if(!startAt.isBefore(now))throw new BusinessRuleException("BOOKING_NOT_STARTED","Booking has not started");yield require(from==BookingStatus.CONFIRMED,BookingStatus.COMPLETED);}case "no-show"->require(from==BookingStatus.CONFIRMED,BookingStatus.NO_SHOW);default->throw new BusinessRuleException("INVALID_BOOKING_TRANSITION","Unsupported booking action");};} private BookingStatus require(boolean ok,BookingStatus target){if(!ok)throw new BusinessRuleException("INVALID_BOOKING_TRANSITION","Invalid booking transition");return target;} }

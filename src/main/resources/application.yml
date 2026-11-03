@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: tutor-hub
   datasource:
@@ -33,10 +35,6 @@ app:
     secret: ${JWT_SECRET}
     access-minutes: ${JWT_ACCESS_MINUTES:15}
     refresh-days: ${JWT_REFRESH_DAYS:14}
-  admin:
-    email: ${ADMIN_EMAIL:}
-    password: ${ADMIN_PASSWORD:}
-    full-name: ${ADMIN_FULL_NAME:Administrator}
   storage:
     endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
     access-key: ${MINIO_ACCESS_KEY:minioadmin}

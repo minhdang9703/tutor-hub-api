@@ -56,14 +56,23 @@ docs/                       # architecture and operational documentation
 
 ## 06. Getting Started
 
-Yêu cầu: JDK 21, Maven 3.9+, Docker Desktop/Engine và Docker Compose.
+Yêu cầu: JDK 21, Maven 3.9+ và PostgreSQL 16 cài trực tiếp trên máy. Docker không cần thiết.
 
-```sh
-cp .env.example .env
-# Điền JWT_SECRET Base64 hợp lệ vào .env rồi nạp biến vào shell
-docker compose up -d
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+Tạo user và database local một lần:
+
+```sql
+CREATE ROLE tutorhub LOGIN PASSWORD 'tutorhub';
+CREATE DATABASE tutorhub OWNER tutorhub;
 ```
+
+Sao chép `.env.example` thành `.env`, thay các giá trị cục bộ bằng cấu hình thật (đặc biệt `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` và `JWT_SECRET`). Ứng dụng tự nạp `.env` như file properties khi khởi động. Trên PowerShell:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = 'dev'
+mvn spring-boot:run
+```
+
+Flyway tự tạo schema và seed dữ liệu khi ứng dụng khởi động. Cài MinIO cục bộ khi kiểm thử upload avatar/giấy tờ; cài Mailpit hoặc cấu hình SMTP thật khi kiểm thử email. Chúng không cần chạy chỉ để khởi động API và gọi các endpoint không dùng upload/email.
 
 - Swagger: `http://localhost:8080/swagger-ui.html`
 - Mailpit: `http://localhost:8025`
@@ -71,16 +80,16 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 ## 07. Configuration
 
-Sao chép `.env.example`; không commit `.env` hoặc secret thật.
+Sao chép `.env.example`; `application.yml` tự import `.env` khi file này tồn tại. Biến môi trường của hệ điều hành vẫn có độ ưu tiên cao hơn. Không commit `.env` hoặc secret thật.
 
 | Biến | Mục đích |
 |---|---|
 | `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | Kết nối PostgreSQL |
 | `JWT_SECRET` | Secret Base64 tối thiểu 32 byte cho JWT |
-| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Bootstrap tài khoản ADMIN đầu tiên |
-| `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` | Object storage |
+| `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` | Object storage; chỉ cần khi dùng upload |
 | `CORS_ALLOWED_ORIGINS` | Origins được phép gọi API |
 | `BOOKING_CANCELLATION_MINUTES` | Thời gian tối thiểu trước giờ học để được hủy; mặc định 360 phút |
+| `SPRING_PROFILES_ACTIVE` | Profile Spring Boot cần chạy, ví dụ `dev` |
 
 ## 08. Database Design
 
@@ -121,6 +130,6 @@ Xem [docs/backup.md](docs/backup.md) để backup và kiểm tra khôi phục Po
 
 ## 12. Roadmap & License
 
-Ưu tiên tiếp theo là bổ sung integration test PostgreSQL cho request/application, booking recurring và 20 booking đồng thời; sau đó hoàn thiện endpoint-level OpenAPI examples và giám sát production.
+Ưu tiên tiếp theo là bổ sung integration test PostgreSQL cho request/application, booking recurring và 20 booking đồng thời; sau đó hoàn thiện endpoint-level OpenAPI examples, quy trình provision ADMIN riêng và giám sát production.
 
 Repository hiện chưa có file license. Chỉ thêm license khi chủ sở hữu dự án xác định loại giấy phép phù hợp.

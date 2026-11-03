@@ -1,4 +1,5 @@
 package com.tutorhub.admin.service;
+import com.tutorhub.common.util.JdbcTime;
 
 import com.tutorhub.admin.dto.*;
 import com.tutorhub.common.exception.NotFoundException;
@@ -50,8 +51,8 @@ public class AdminService {
     private long count(String table) { return jdbc.queryForObject("select count(*) from " + table, Long.class); }
     private void recalculateRating(long tutorId) { jdbc.update("update tutor_profiles set rating_avg=(select coalesce(avg(rating),0) from reviews where tutor_id=? and visible),rating_count=(select count(*) from reviews where tutor_id=? and visible) where user_id=?", tutorId, tutorId, tutorId); }
     private void audit(long actorId, String action, String type, long id) { jdbc.update("insert into audit_logs(actor_id,action,entity_type,entity_id) values(?,?,?,?)", actorId, action, type, id); }
-    private AdminUserResponse user(ResultSet rs, int row) throws java.sql.SQLException { return new AdminUserResponse(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getObject(7, Instant.class)); }
-    private AdminReportResponse report(ResultSet rs, int row) throws java.sql.SQLException { return new AdminReportResponse(rs.getLong(1), rs.getLong(2), rs.getString(3), rs.getLong(4), rs.getString(5), rs.getString(6), rs.getString(7), (Long) rs.getObject(8), rs.getString(9), rs.getObject(10, Instant.class), rs.getObject(11, Instant.class)); }
-    private AuditLogResponse auditLog(ResultSet rs, int row) throws java.sql.SQLException { return new AuditLogResponse(rs.getLong(1), (Long) rs.getObject(2), rs.getString(3), rs.getString(4), (Long) rs.getObject(5), rs.getString(6), rs.getObject(7, Instant.class)); }
+    private AdminUserResponse user(ResultSet rs, int row) throws java.sql.SQLException { return new AdminUserResponse(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), JdbcTime.instant(rs,7)); }
+    private AdminReportResponse report(ResultSet rs, int row) throws java.sql.SQLException { return new AdminReportResponse(rs.getLong(1), rs.getLong(2), rs.getString(3), rs.getLong(4), rs.getString(5), rs.getString(6), rs.getString(7), (Long) rs.getObject(8), rs.getString(9), JdbcTime.instant(rs,10), JdbcTime.instant(rs,11)); }
+    private AuditLogResponse auditLog(ResultSet rs, int row) throws java.sql.SQLException { return new AuditLogResponse(rs.getLong(1), (Long) rs.getObject(2), rs.getString(3), rs.getString(4), (Long) rs.getObject(5), rs.getString(6), JdbcTime.instant(rs,7)); }
     private <T> PageResponse<T> page(List<T> content, int page, int size, long total) { return new PageResponse<>(content, page, size, total, (int) Math.ceil((double) total / size)); }
 }

@@ -1,4 +1,5 @@
 package com.tutorhub.chat.service;
+import com.tutorhub.common.util.JdbcTime;
 
 import com.tutorhub.chat.dto.*;
 import com.tutorhub.common.exception.*;
@@ -38,7 +39,7 @@ public class ChatService {
                 if (request.requestId() == null) statement.setNull(3, java.sql.Types.BIGINT); else statement.setLong(3, request.requestId());
                 return statement;
             }, keys);
-            return member(keys.getKey().longValue(), principal.id());
+            return member(((Number) keys.getKeys().get("id")).longValue(), principal.id());
         } catch (DataIntegrityViolationException ignored) {
             Long id = jdbc.query("select id from conversations where parent_id=? and tutor_id=?", rs -> rs.next() ? rs.getLong(1) : null, parentId, tutorId);
             if (id == null) throw ignored;
@@ -68,7 +69,7 @@ public class ChatService {
         GeneratedKeyHolder keys = new GeneratedKeyHolder();
         jdbc.update(connection -> { var statement = connection.prepareStatement("insert into messages(conversation_id,sender_id,content) values(?,?,?)", Statement.RETURN_GENERATED_KEYS); statement.setLong(1, conversationId); statement.setLong(2, principal.id()); statement.setString(3, request.content()); return statement; }, keys);
         jdbc.update("update conversations set last_message_at=now() where id=?", conversationId);
-        return new MessageResponse(keys.getKey().longValue(), principal.id(), request.content(), null, Instant.now(), caution);
+        return new MessageResponse(((Number) keys.getKeys().get("id")).longValue(), principal.id(), request.content(), null, Instant.now(), caution);
     }
 
     @Transactional
@@ -80,6 +81,6 @@ public class ChatService {
         return result;
     }
     private boolean confirmed(ConversationResponse conversation) { return jdbc.queryForObject("select exists(select 1 from bookings where parent_id=? and tutor_id=? and status='CONFIRMED')", Boolean.class, conversation.parentId(), conversation.tutorId()); }
-    private ConversationResponse mapConversation(ResultSet rs, int ignored) throws java.sql.SQLException { return new ConversationResponse(rs.getLong(1), rs.getLong(2), rs.getLong(3), (Long) rs.getObject(4), rs.getObject(5, Instant.class), rs.getObject(6, Instant.class)); }
-    private MessageResponse mapMessage(ResultSet rs, boolean caution) throws java.sql.SQLException { return new MessageResponse(rs.getLong(1), rs.getLong(2), rs.getString(3), rs.getObject(4, Instant.class), rs.getObject(5, Instant.class), caution); }
+    private ConversationResponse mapConversation(ResultSet rs, int ignored) throws java.sql.SQLException { return new ConversationResponse(rs.getLong(1), rs.getLong(2), rs.getLong(3), (Long) rs.getObject(4), JdbcTime.instant(rs,5), JdbcTime.instant(rs,6)); }
+    private MessageResponse mapMessage(ResultSet rs, boolean caution) throws java.sql.SQLException { return new MessageResponse(rs.getLong(1), rs.getLong(2), rs.getString(3), JdbcTime.instant(rs,4), JdbcTime.instant(rs,5), caution); }
 }

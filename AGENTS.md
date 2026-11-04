@@ -20,7 +20,7 @@
 
 1. Copy `.env.example` to `.env` and provide a real Base64-encoded 32-byte `JWT_SECRET`.
 2. Start PostgreSQL, MinIO, and Mailpit: `docker compose up -d`.
-3. Run the app: `mvn spring-boot:run -Dspring-boot.run.profiles=dev`.
+3. Run the app: set `SPRING_PROFILES_ACTIVE=dev`, then run `mvn spring-boot:run`.
 
 Swagger is at `http://localhost:8080/swagger-ui.html`; Mailpit is at `http://localhost:8025`.
 

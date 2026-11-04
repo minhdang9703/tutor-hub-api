@@ -5,3 +5,7 @@ spring:
   jpa:
     properties:
       hibernate.jdbc.time_zone: UTC
+management:
+  health:
+    mail:
+      enabled: false
